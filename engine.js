@@ -47,7 +47,7 @@ export class Engine {
         window.removeEventListener('pointerdown', this.handleMouseDown);
         window.removeEventListener('resize', this.handleWindowResize);
         //window.cancelAnimationFrame(this.requestID);
-        
+
         this.raycaster = null;
         this.el = null;
 
@@ -91,7 +91,7 @@ export class Engine {
 
 
     addSatellite = (station, color, size) => {
-        
+
         //const sat = this._getSatelliteMesh(color, size);
         const sat = this._getSatelliteSprite(color, size);
         const pos = this._getSatellitePositionFromTle(station);
@@ -114,8 +114,9 @@ export class Engine {
         return fetch(url).then(res => {
             if (res.ok) {
                 return res.text().then(text => {
-                    return this._addTleFileStations(text, color, options);
-                
+                    console.log("text", text)
+                   return this._addTleFileStations(text, color, options);
+
                 });
             }
         });
@@ -136,7 +137,7 @@ export class Engine {
         }
 
         var points = [];
-        
+
         for (var i = 0; i <= minutes; i += intervalMinutes) {
             const date = new Date(initialDate.getTime() + i * 60000);
 
@@ -182,13 +183,17 @@ export class Engine {
 
         const { satelliteSize } = stationOptions;
 
-        stations.forEach(s => {
+        console.log("stations before filter", stations)
+        const test = stations.filter(item => item.name.includes("STARLINK"))
+        console.log("stations after filter", stations)
+
+        test.forEach(s => {
             this.addSatellite(s, color, satelliteSize);
         });
 
         this.render();
 
-        return stations;
+        return test;
     }
 
 
@@ -213,10 +218,10 @@ export class Engine {
 
     _setupSpriteMaterials = (color) => {
         if (this.material && this.lastColor === color) return;
-        
+
         this._satelliteSprite = new THREE.TextureLoader().load(circle, this.render);
         this.selectedMaterial = new THREE.SpriteMaterial({
-            map: this._satelliteSprite, 
+            map: this._satelliteSprite,
             color: 0xFF0000,
             sizeAttenuation: false
         });
@@ -224,13 +229,13 @@ export class Engine {
             map: this._satelliteSprite,
             color: 0xfca300,
             sizeAttenuation: false
-        });            
+        });
         this.material = new THREE.SpriteMaterial({
-            map: this._satelliteSprite, 
-            color: color, 
+            map: this._satelliteSprite,
+            color: color,
             sizeAttenuation: false
         });
-        this.lastColor = color;            
+        this.lastColor = color;
     }
 
     _getSatelliteSprite = (color, size) => {
@@ -257,7 +262,7 @@ export class Engine {
         station.mesh.position.set(pos.x, pos.y, pos.z);
     }
 
-    
+
     updateAllPositions = (date) => {
         if (!this.stations) return;
 
@@ -265,7 +270,7 @@ export class Engine {
             this.updateSatellitePosition(station, date);
         });
 
-        if (this.referenceFrame === 2) 
+        if (this.referenceFrame === 2)
             this._updateEarthRotation(date);
         else
             this.render();
@@ -329,7 +334,7 @@ export class Engine {
 
     render = () => {
         this.renderer.render(this.scene, this.camera);
-        //this.requestID = window.requestAnimationFrame(this._animationLoop); 
+        //this.requestID = window.requestAnimationFrame(this._animationLoop);
     };
 
 
@@ -353,7 +358,7 @@ export class Engine {
         });
 
         this.earthMesh =  new THREE.Mesh(geometry, material);
-        group.add(this.earthMesh);        
+        group.add(this.earthMesh);
 
         // // Axis
         // material = new THREE.LineBasicMaterial({color: 0xffffff});
@@ -362,7 +367,7 @@ export class Engine {
         //     new THREE.Vector3(0, -7000, 0),
         //     new THREE.Vector3(0, 7000, 0)
         // );
-        
+
         // var earthRotationAxis = new THREE.Line(geometry, material);
         // group.add(earthRotationAxis);
 

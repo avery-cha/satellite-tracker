@@ -8,6 +8,23 @@ import Fork from './fork';
 import * as qs from 'query-string';
 import Highlights from './highlights';
 import DateSlider from './Options/DateSlider';
+import styled from 'styled-components';
+const Centered = styled.div`
+display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+`
+const Size = styled.div`
+    display: flex;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    height: 750px;
+    width: 750px;
+`
 
 // Some config
 const UseDateSlider = false;
@@ -22,11 +39,11 @@ class App extends Component {
 
     state = {
         selected: [],
-        stations: [], 
+        stations: [],
         query: null,
         queryObjectCount: 0,
         initialDate: new Date().getTime(),
-        currentDate: new Date().getTime(), 
+        currentDate: new Date().getTime(),
         referenceFrame: UseDateSlider ? 2 : 1
     }
 
@@ -120,7 +137,7 @@ class App extends Component {
     addCelestrakSets = () => {
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/weather.txt'), 0x00ffff)
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/cosmos-2251-debris.txt'), 0xff0090)
-        this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle'), 0xffffff)        
+        this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/gp.php?NAME=STARLINK'), 0xffffff)
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/science.txt'), 0xffff00)
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/stations.txt'), 0xffff00)
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/iridium-NEXT.txt'), 0x00ff00)
@@ -130,15 +147,21 @@ class App extends Component {
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/gps-ops.txt'), 0xffffff, { orbitMinutes: 0, satelliteSize: 200 })
         //this.engine.loadLteFileStations(getCorsFreeUrl('https://celestrak.org/NORAD/elements/glo-ops.txt'), 0xff0000, { orbitMinutes: 500, satelliteSize: 500 })
             .then(stations => {
+                console.log("Stations", stations)
+                stations = stations.filter(item => item.name.includes("STARLINK"))
+                console.log("testArr", stations)
+
                 this.setState({stations});
                 this.processQuery(stations);
             });
 
     }
 
-    addAmsatSets = () => {
-        this.engine.loadLteFileStations(getCorsFreeUrl('https://www.amsat.org/tle/current/nasabare.txt'), 0xffff00);
-    }
+    // addAmsatSets = () => {
+    //     this.engine.loadLteFileStations(getCorsFreeUrl('https://www.amsat.org/tle/current/nasabare.txt'), 0xffff00)
+    //     .then(sets => console.log("amsatsets", sets))
+    //     .then(a => this.engine.loadLteFileStations(getCorsFreeUrl('https://www.amsat.org/tle/current/nasabare.txt'), 0xffff00))
+    // }
 
     handleTimer = () => {
         // By default, update in realtime every second, unless dateSlider is displayed.
@@ -153,7 +176,7 @@ class App extends Component {
 
     handleRemoveSelected = (station) => {
         if (!station) return;
-        
+
         this.deselectStation(station);
     }
 
@@ -193,15 +216,17 @@ class App extends Component {
         const maxMs = initialDate + DateSliderRangeInMilliseconds;
 
         return (
-            <div>
-                <Fork />
+           <Centered>
+            <Size>
+
                 <Highlights query={this.state.query} total={this.state.queryObjectCount} />
                 <Info stations={stations} refMode={this.state.referenceFrame} />
                 <Search stations={this.state.stations} onResultClick={this.handleSearchResultClick} />
                 <SelectedStations selected={selected} onRemoveStation={this.handleRemoveSelected} onRemoveAll={this.handleRemoveAllSelected} />
                 {UseDateSlider && <DateSlider min={initialDate} max={maxMs} value={currentDate} onChange={this.handleDateChange} onRender={this.renderDate} />}
-                <div ref={c => this.el = c} style={{ width: '99%', height: '99%' }} />
-            </div>
+                <div ref={c => this.el = c} style={{ width: '50%', height: '50%' }} />
+            </Size>
+            </Centered>
         )
     }
 }
